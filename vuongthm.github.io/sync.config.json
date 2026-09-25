@@ -1,0 +1,22 @@
+{
+  "_comment": "Each entry maps a sibling content repo to destination paths inside this repo. Paths are relative to the repo root. Local dev reads the sibling folders next to this repo; CI checks them out side by side (see .github/workflows/deploy.yml).",
+  "_kind": "`kind` selects the destination (content/<kind>/ + public/media/<kind>/). Supported: stories | notes | albums. It replaces matching on the repository name, so extra repositories of an existing kind are added by name alone.",
+  "_addingMoreGalleries": "GitHub caps each repository at roughly 1 GB, so photos and videos can be spread over several repositories (my-album, my-album-2, my-album-3, ...). Add one entry per repository with kind=albums and check the extra repositories out in .github/workflows/deploy.yml; nothing else changes. One rule: the immediate subfolder names inside each repository become album slugs, so they must be unique across all repositories of the same kind (use `street-2024` in the second gallery rather than reusing `travel`).",
+  "repos": [
+    {
+      "name": "stories",
+      "kind": "stories",
+      "github": "vuongthm/stories"
+    },
+    {
+      "name": "network-notes",
+      "kind": "notes",
+      "github": "vuongthm/network-notes"
+    },
+    {
+      "name": "my-album",
+      "kind": "albums",
+      "github": "vuongthm/my-album"
+    }
+  ]
+}

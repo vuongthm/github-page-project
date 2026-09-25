@@ -1,0 +1,31 @@
+version: 2
+updates:
+  # Application dependencies. Grouped so a routine patch bump produces one PR
+  # instead of twenty, which keeps the review load sustainable.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      # Major upgrades of the framework are deliberate, manual work.
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions. A compromised or moved tag in a workflow is one of the
+  # most common supply-chain attack vectors, so these get their own cadence.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels: ["dependencies", "ci"]

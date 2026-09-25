@@ -1,0 +1,139 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  repository_dispatch:
+    types: [content-updated]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  # Quality gate. Runs in parallel with the build so a broken commit fails fast
+  # without delaying deployment of a good one.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main site
+        uses: actions/checkout@v5
+        with:
+          path: core
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.4 --activate
+
+      - name: Install dependencies
+        working-directory: ./core
+        run: pnpm install --frozen-lockfile
+
+      # `lib/content.generated.ts` is produced by the sync pipeline, so the
+      # type checker needs it to exist before it can validate the components.
+      - name: Generate content data
+        working-directory: ./core
+        run: pnpm run pipeline
+
+      - name: Typecheck
+        working-directory: ./core
+        run: pnpm run typecheck
+
+      - name: Lint
+        working-directory: ./core
+        run: pnpm run lint
+
+      - name: Unit tests
+        working-directory: ./core
+        run: pnpm run test
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout core main web repository 
+      - name: Check out main site
+        uses: actions/checkout@v5
+        with:
+          path: core
+
+      # Checkout content repositories (Story, Notes, and the new Album)
+      - name: Check out stories content
+        uses: actions/checkout@v5
+        with:
+          repository: vuongthm/stories
+          path: stories
+        continue-on-error: true
+
+      - name: Check out network-notes content
+        uses: actions/checkout@v5
+        with:
+          repository: vuongthm/network-notes
+          path: network-notes
+        continue-on-error: true
+
+      # Added: Automatically checkout my-album content repository during build phase on GitHub
+      - name: Check out my-album content
+        uses: actions/checkout@v5
+        with:
+          repository: vuongthm/my-album
+          path: my-album
+        continue-on-error: true
+
+      # Generate temporary passwords.json inside core workspace from secure GitHub secret
+      - name: Create temporary passwords.json from secret
+        working-directory: ./core
+        run: echo '${{ secrets.POST_PASSWORDS }}' > passwords.json
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.4 --activate
+
+      # Install dependencies using frozen lockfile
+      - name: Install dependencies
+        working-directory: ./core
+        run: pnpm install --frozen-lockfile
+
+      # Build and export static assets. Image optimisation runs here (and not on
+      # contributors' laptops) because it is the heaviest step and the runner has
+      # spare capacity.
+      - name: Build site
+        working-directory: ./core
+        run: pnpm run build
+        env:
+          OPTIMIZE_IMAGES: "1"
+
+      # Upload statically compiled /out artifact to GitHub Pages
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./core/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

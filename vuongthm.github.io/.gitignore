@@ -1,0 +1,28 @@
+node_modules/
+.next/
+out/
+.DS_Store
+tsconfig.tsbuildinfo
+
+# Test / lint caches
+coverage/
+.eslintcache
+.vitest/
+
+# Build cache (content fingerprint for scripts/generate-content-data.mjs)
+.cache/
+
+# Tệp sinh ra tự động trong quá trình đồng bộ cục bộ (Không push lên repo)
+content/notes/
+content/stories/
+content/albums/
+public/media/notes/
+public/media/stories/
+public/media/albums/
+lib/content.generated.ts
+passwords.json
+
+# Ảnh WebP được sinh lại ở mỗi lần build bởi scripts/optimize-images.mjs
+public/**/*.webp
+
+
