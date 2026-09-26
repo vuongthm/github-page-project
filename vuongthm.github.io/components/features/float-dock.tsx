@@ -269,19 +269,22 @@ export function FloatDock({ lang }: { lang: Lang }) {
         </div>
       ) : null}
 
-      {actions.map(({ id, icon: Icon, label, onClick, active }) => (
-        <button
-          key={id}
-          type="button"
-          onClick={onClick}
-          aria-label={label}
-          title={label}
-          aria-pressed={active === undefined ? undefined : active}
-          className={cn(DOCK_BUTTON, active && "border-accent-brand text-accent-brand")}
-        >
-          <Icon size={16} />
-        </button>
-      ))}
+                  {actions.map(({ id, icon, label, onClick, active }) => {
+        const Icon: any = icon
+        return (
+          <button
+            key={id}
+            type="button"
+            onClick={onClick}
+            aria-label={label}
+            title={label}
+            aria-pressed={active === undefined ? undefined : active}
+            className={cn(DOCK_BUTTON, active && "border-accent-brand text-accent-brand")}
+          >
+            <Icon size={16} />
+          </button>
+        )
+      })}
     </div>
   )
 }

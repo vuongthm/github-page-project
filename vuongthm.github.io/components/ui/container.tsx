@@ -20,8 +20,9 @@ interface ContainerProps {
 }
 
 export function Container({ children, className, size = "default", as: Component = "div" }: ContainerProps) {
+  const Comp = Component as any
   return (
-    <Component
+    <Comp
       className={cn(
         "mx-auto w-full",
         // Gutters come from the spacing token so every page shares one rhythm.
@@ -33,6 +34,6 @@ export function Container({ children, className, size = "default", as: Component
       )}
     >
       {children}
-    </Component>
+    </Comp>
   )
 }

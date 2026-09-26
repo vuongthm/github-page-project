@@ -32,7 +32,7 @@ export function HubCard({
   href,
   title,
   description,
-  icon: Icon,
+       icon,
   count,
   countLabel,
   latest,
@@ -40,6 +40,7 @@ export function HubCard({
   emphasis = false,
   children,
 }: HubCardProps) {
+  const Icon: any = icon
   return (
     <Link
       href={href}

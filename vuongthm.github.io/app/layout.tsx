@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from "next"
-import { Newsreader, Inter, JetBrains_Mono } from "next/font/google"
+import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { LangProvider } from "@/components/providers/lang-provider"
 import { ReadingProvider } from "@/components/providers/reading-provider"
-import { SmoothAnchors } from "@/components/layout/smooth-anchors"
 import { Toaster } from "@/components/ui/sonner"
 import { JsonLd } from "@/components/seo/json-ld"
 import { personJsonLd, websiteJsonLd } from "@/lib/seo"
@@ -17,20 +16,9 @@ import { siteConfig } from "@/lib/site.config"
  * GitHub Pages cannot send response headers, so the policy has to travel as a
  * meta tag. It locks the page to same-origin resources: no third-party scripts,
  * no plugins, no form submissions off-site, no `<base>` hijacking.
- *
- * `'unsafe-inline'` for scripts is required by `next-themes`, which injects a
- * blocking script to apply the saved theme before first paint. The upgrade path
- * is a hash-based policy (`script-src 'self' 'sha256-…'`), which needs the hash
- * recomputed whenever that script changes.
- *
- * `frame-ancestors` is intentionally absent: the specification requires it to be
- * delivered as a header, and browsers ignore it inside a meta tag.
  */
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  // React's development build uses eval() to reconstruct call stacks for its
-  // error overlays, so the dev server needs it. Production never calls eval(),
-  // so the deployed policy stays without the escape hatch.
   process.env.NODE_ENV === "development"
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
     : "script-src 'self' 'unsafe-inline'",
@@ -52,11 +40,11 @@ const inter = Inter({
   display: "swap",
 })
 
-// Headings and long-form reading. Newsreader carries a Vietnamese subset, which
-// matters because every chapter and note is bilingual.
-const newsreader = Newsreader({
-  subsets: ["latin", "vietnamese"],
-  variable: "--font-newsreader",
+// Display font for headings - modern geometric
+const newmont = Inter({
+  subsets: ["latin"],
+  variable: "--font-newmont",
+  weight: ["400", "600", "700"],
   display: "swap",
 })
 
@@ -106,7 +94,7 @@ export const metadata: Metadata = {
     icon: [
       { url: "/icon-light-32x32.png", media: "(prefers-color-scheme: light)" },
       { url: "/icon-dark-32x32.png", media: "(prefers-color-scheme: dark)" },
-      { url: "/icon.svg", type: "image/svg+xml" }, // Scalable vector logo for browser tabs
+      { url: "/icon.svg", type: "image/svg+xml" },
     ],
     apple: "/apple-icon.png",
   },
@@ -132,7 +120,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${newsreader.variable} ${jetbrainsMono.variable} bg-surface`}
+      className={`${inter.variable} ${newmont.variable} ${jetbrainsMono.variable} bg-surface`}
     >
       <head>
         {/* Must be the first meta tag so it applies to everything that follows. */}
@@ -151,13 +139,12 @@ export default function RootLayout({
         */}
         <script dangerouslySetInnerHTML={{ __html: readingPreferencesInitScript }} />
       </head>
-      <body className="font-sans antialiased min-h-screen">
+      <body className="font-sans antialiased min-h-screen overflow-x-hidden">
         <JsonLd data={websiteJsonLd(siteConfig.defaultLang)} />
         <JsonLd data={personJsonLd()} />
         <ThemeProvider>
           <LangProvider>
             <ReadingProvider>
-              <SmoothAnchors />
               {children}
               <Toaster richColors position="bottom-right" />
             </ReadingProvider>

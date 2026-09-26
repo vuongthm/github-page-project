@@ -1,21 +1,6 @@
 @import 'tailwindcss' source(none);
 @import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
 
-/*
-  Tailwind class scanning — declared explicitly instead of relying on automatic
-  source detection.
-
-  With auto-detection, Tailwind walks the project tree to guess which files can
-  contain class names. Measured on this repository that costs ~341 ms per
-  compile; with explicit sources it drops to ~44 ms, and the emitted CSS is
-  byte-for-byte identical (102 KB). The saving matters because Turbopack spawns
-  one PostCSS worker per parallel route compilation, and each worker paid that
-  cost again.
-
-  Paths are relative to this file. Add a new top-level source directory here if
-  it contains class names.
-*/
 @source '../app';
 @source '../components';
 @source '../lib';
@@ -25,9 +10,83 @@
 
 @theme inline {
   --font-sans: var(--font-inter), 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-newsreader), 'Newsreader', ui-serif, Georgia, serif;
+  --font-display: var(--font-newmont), 'Newmont', ui-serif, Georgia, serif;
   --font-mono: var(--font-jetbrains), 'JetBrains Mono', ui-monospace, monospace;
 
+  /* === Modern Color System — "Quantum Void" === */
+  /* Light theme: Cosmic depth with holographic glow */
+  --background: oklch(0.97 0.005 90);
+  --surface: oklch(0.99 0 0);
+  --surface-sunken: oklch(0.95 0.003 90);
+  --surface-raised: oklch(1 0 0);
+  --card: oklch(0.99 0 0);
+  --card-foreground: oklch(0.15 0.01 280);
+  --popover: oklch(0.99 0 0);
+  --popover-foreground: oklch(0.15 0.01 280);
+
+  --foreground: oklch(0.15 0.01 280);
+  --foreground-secondary: oklch(0.45 0.015 280);
+  --foreground-tertiary: oklch(0.65 0.01 280);
+
+  --muted: oklch(0.96 0.005 90);
+  --muted-foreground: oklch(0.45 0.015 280);
+
+  --border: oklch(0.92 0.008 90);
+  --border-strong: oklch(0.82 0.015 90);
+  --input: oklch(0.92 0.008 90);
+
+  /* Holographic gradient accent */
+  --accent-brand: oklch(0.72 0.18 270);
+  --accent-brand-foreground: oklch(0.99 0.005 270);
+  --accent-gradient: linear-gradient(135deg, oklch(0.72 0.18 270), oklch(0.68 0.2 300));
+  --ring: oklch(0.72 0.18 270);
+
+  --primary: oklch(0.99 0 0);
+  --primary-foreground: oklch(0.15 0.01 280);
+  --secondary: oklch(0.96 0.005 90);
+  --secondary-foreground: oklch(0.25 0.015 280);
+  --accent: oklch(0.96 0.005 90);
+  --accent-foreground: oklch(0.25 0.015 280);
+  --destructive: oklch(0.58 0.22 27);
+
+  /* Tags - cyber teal */
+  --sea: oklch(0.76 0.12 200);
+  --sea-foreground: oklch(0.12 0.02 200);
+
+  /* Radius system */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  /* Layout */
+  --container-max: 1280px;
+  --reading-measure: 68ch;
+  --header-h: 4rem;
+
+  /* Fluid typography - modern scale */
+  --fs-caption: clamp(0.7rem, 0.65rem + 0.2vw, 0.8rem);
+  --fs-small: clamp(0.8rem, 0.75rem + 0.3vw, 0.9rem);
+  --fs-body: clamp(0.95rem, 0.9rem + 0.4vw, 1.05rem);
+  --fs-lead: clamp(1.1rem, 1.05rem + 0.5vw, 1.25rem);
+  --fs-h3: clamp(1.25rem, 1.15rem + 0.6vw, 1.5rem);
+  --fs-h2: clamp(1.6rem, 1.4rem + 0.9vw, 1.9rem);
+  --fs-h1: clamp(2rem, 1.7rem + 1.3vw, 2.5rem);
+  --fs-display: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  --fs-eyebrow: 0.75rem;
+
+  /* Spacing */
+  --space-section: clamp(3rem, 2.5rem + 3vw, 5rem);
+  --space-gutter: clamp(1.5rem, 1.2rem + 1.5vw, 2.5rem);
+
+  /* Elevation - modern glow */
+  --elevation-1: 0 1px 3px oklch(0.15 0.01 280 / 0.06), 0 1px 2px oklch(0.15 0.01 280 / 0.04);
+  --elevation-2: 0 4px 6px oklch(0.15 0.01 280 / 0.06), 0 10px 15px oklch(0.15 0.01 280 / 0.08);
+  --elevation-3: 0 10px 15px oklch(0.15 0.01 280 / 0.08), 0 25px 50px oklch(0.15 0.01 280 / 0.12);
+
+  /* Color utilities */
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-foreground: var(--foreground);
@@ -49,20 +108,11 @@
   --color-destructive: var(--destructive);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-
-  /* Radius: 12 px for controls, 20 px for cards and bento tiles. */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.625rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1.25rem;
-
-  /* New palette entries, exposed as utilities: bg-sea, text-sea, etc. */
   --color-sea: var(--sea);
   --color-sea-foreground: var(--sea-foreground);
   --color-surface-sunken: var(--surface-sunken);
   --color-border-strong: var(--border-strong);
 
-  /* Fluid type scale. `text-display` … `text-eyebrow`. */
   --text-display: var(--fs-display);
   --text-h1: var(--fs-h1);
   --text-h2: var(--fs-h2);
@@ -73,7 +123,6 @@
   --text-caption: var(--fs-caption);
   --text-eyebrow: var(--fs-eyebrow);
 
-  /* Three elevation levels replace Tailwind's neutral shadows. */
   --shadow-sm: var(--elevation-1);
   --shadow-md: var(--elevation-2);
   --shadow-lg: var(--elevation-3);
@@ -81,127 +130,58 @@
 
 :root {
   color-scheme: light;
-
-  /* ======================================================================
-     Design tokens — "Modern Editorial Bento"
-     Defined once. Components never hardcode colour, size or spacing.
-     Source of truth for the whole UI; see PROJECT.md §10.
-
-     Palette is authored in OKLCH so lightness stays perceptually even across
-     hues (a neutral ramp and an accent ramp then "feel" the same weight).
-     Budget: 60 % warm-neutral surfaces, 30 % ink/text, 10 % one accent.
-     The teal is reserved for tags only, so the accent stays meaningful.
-     ====================================================================== */
-
-  /* --- Surfaces: warm neutral paper, never pure grey -------------------- */
-  --background: oklch(0.985 0.004 85);
-  --surface: oklch(1 0 0);
-  --surface-sunken: oklch(0.965 0.006 85);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.02 75);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.02 75);
-
-  /* --- Text: warm ink. Contrast vs --background ~14.5:1 (AA/AAA) --------- */
-  --foreground: oklch(0.22 0.02 75);
-  --muted: oklch(0.965 0.006 85);
-  --muted-foreground: oklch(0.50 0.018 75); /* ~5.2:1 on paper: AA */
-
-  /* --- Borders: 1 px, low alpha ---------------------------------------- */
-  --border: oklch(0.90 0.008 80);
-  --border-strong: oklch(0.82 0.014 80);
-  --input: oklch(0.90 0.008 80);
-
-  /* --- The single accent: indigo-violet -------------------------------- */
-  --accent-brand: oklch(0.55 0.2 275); /* ~5.6:1 on paper: AA for text */
-  --accent-brand-foreground: oklch(0.99 0.005 275);
-  --ring: oklch(0.55 0.2 275);
-  --primary: oklch(0.22 0.02 75);
-  --primary-foreground: oklch(0.985 0.004 85);
-  --secondary: oklch(0.965 0.006 85);
-  --secondary-foreground: oklch(0.22 0.02 75);
-  --accent: oklch(0.965 0.006 85);
-  --accent-foreground: oklch(0.22 0.02 75);
-  --destructive: oklch(0.58 0.22 27);
-
-  /* --- Tags only -------------------------------------------------------- */
-  --sea: oklch(0.52 0.09 200);
-  --sea-foreground: oklch(0.99 0.005 200);
-
-  /* --- Radius: 12 / 20 -------------------------------------------------- */
-  --radius: 0.75rem; /* 12px — controls, chips, small surfaces */
-
-  /* --- Layout ----------------------------------------------------------- */
-  --container-max: 75rem; /* 1200px grid container */
-  --reading-measure: 68ch; /* long-form line length */
-  --header-h: 3.5rem; /* 56px; focus mode sets this to 0 */
-
-  /* ======================================================================
-     Type scale — ratio 1.2, fluid via clamp().
-     Anchored low enough that nothing reads as "big"; hierarchy comes from
-     weight, family and spacing rather than from size alone.
-     ====================================================================== */
-  --fs-caption: clamp(0.75rem, 0.73rem + 0.08vw, 0.8rem); /* 12 → 12.8 */
-  --fs-small: 0.875rem; /* 14 */
-  --fs-body: 1rem; /* 16 */
-  --fs-lead: clamp(1.0625rem, 1.02rem + 0.2vw, 1.125rem); /* 17 → 18 */
-  --fs-h3: clamp(1.125rem, 1.08rem + 0.22vw, 1.2rem); /* 18 → 19.2 */
-  --fs-h2: clamp(1.375rem, 1.28rem + 0.45vw, 1.44rem); /* 22 → 23 */
-  --fs-h1: clamp(1.75rem, 1.55rem + 0.9vw, 2.07rem); /* 28 → 33 */
-  --fs-display: clamp(2.25rem, 1.8rem + 2.2vw, 3rem); /* 36 → 48 */
-  --fs-eyebrow: 0.6875rem; /* 11 — mono labels */
-
-  /* --- Vertical rhythm -------------------------------------------------- */
-  --space-section: clamp(2.5rem, 1.9rem + 2.6vw, 4.5rem);
-  --space-gutter: clamp(1.25rem, 1rem + 1.2vw, 2rem);
-
-  /* --- Elevation: three soft, layered levels (never one big blur) ------- */
-  --elevation-1: 0 1px 2px oklch(0.22 0.02 75 / 0.05),
-    0 1px 3px oklch(0.22 0.02 75 / 0.04);
-  --elevation-2: 0 2px 4px oklch(0.22 0.02 75 / 0.05),
-    0 8px 20px oklch(0.22 0.02 75 / 0.06);
-  --elevation-3: 0 4px 8px oklch(0.22 0.02 75 / 0.05),
-    0 18px 44px oklch(0.22 0.02 75 / 0.1);
 }
+
+/*
+  There is deliberately no `@media (prefers-color-scheme: dark)` block.
+  It used to duplicate the whole dark palette and the two copies drifted.
+  `next-themes` applies `.dark` before first paint.
+*/
 
 .dark {
   color-scheme: dark;
 
-  /* Warm-tinted charcoal, never pure black: the accent needs a surface with
-     some temperature or it reads as a warning light. */
-  --background: oklch(0.16 0.008 265);
-  --surface: oklch(0.2 0.01 265);
-  --surface-sunken: oklch(0.185 0.008 265);
-  --card: oklch(0.2 0.01 265);
-  --card-foreground: oklch(0.96 0.005 265);
-  --popover: oklch(0.2 0.01 265);
-  --popover-foreground: oklch(0.96 0.005 265);
+  /* Quantum Void - deep space palette */
+  --background: oklch(0.06 0.005 280);
+  --surface: oklch(0.09 0.008 280);
+  --surface-sunken: oklch(0.07 0.006 280);
+  --surface-raised: oklch(0.11 0.01 280);
+  --card: oklch(0.095 0.01 280);
+  --card-foreground: oklch(0.94 0.005 280);
+  --popover: oklch(0.095 0.01 280);
+  --popover-foreground: oklch(0.94 0.005 280);
 
-  --foreground: oklch(0.96 0.005 265);
-  --muted: oklch(0.24 0.01 265);
-  --muted-foreground: oklch(0.72 0.015 265);
+  --foreground: oklch(0.94 0.005 280);
+  --foreground-secondary: oklch(0.72 0.015 280);
+  --foreground-tertiary: oklch(0.55 0.01 280);
 
-  --border: oklch(0.28 0.012 265);
-  --border-strong: oklch(0.37 0.016 265);
-  --input: oklch(0.28 0.012 265);
+  --muted: oklch(0.13 0.01 280);
+  --muted-foreground: oklch(0.62 0.015 280);
 
-  --accent-brand: oklch(0.75 0.15 275);
-  --accent-brand-foreground: oklch(0.18 0.03 275);
-  --ring: oklch(0.75 0.15 275);
-  --primary: oklch(0.96 0.005 265);
-  --primary-foreground: oklch(0.16 0.008 265);
-  --secondary: oklch(0.24 0.01 265);
-  --secondary-foreground: oklch(0.96 0.005 265);
-  --accent: oklch(0.24 0.01 265);
-  --accent-foreground: oklch(0.96 0.005 265);
-  --destructive: oklch(0.7 0.19 22);
+  --border: oklch(0.20 0.012 280);
+  --border-strong: oklch(0.28 0.018 280);
+  --input: oklch(0.20 0.012 280);
 
-  --sea: oklch(0.76 0.09 200);
-  --sea-foreground: oklch(0.16 0.02 200);
+  /* Holographic accent in dark mode */
+  --accent-brand: oklch(0.78 0.22 270);
+  --accent-brand-foreground: oklch(0.12 0.02 280);
+  --accent-gradient: linear-gradient(135deg, oklch(0.78 0.22 270), oklch(0.74 0.24 300));
+  --ring: oklch(0.78 0.22 270);
 
-  --elevation-1: 0 1px 2px oklch(0 0 0 / 0.4), 0 1px 3px oklch(0 0 0 / 0.3);
-  --elevation-2: 0 2px 4px oklch(0 0 0 / 0.4), 0 8px 20px oklch(0 0 0 / 0.32);
-  --elevation-3: 0 4px 8px oklch(0 0 0 / 0.45), 0 18px 44px oklch(0 0 0 / 0.42);
+  --primary: oklch(0.11 0.01 280);
+  --primary-foreground: oklch(0.94 0.005 280);
+  --secondary: oklch(0.13 0.01 280);
+  --secondary-foreground: oklch(0.94 0.005 280);
+  --accent: oklch(0.13 0.01 280);
+  --accent-foreground: oklch(0.94 0.005 280);
+  --destructive: oklch(0.68 0.24 22);
+
+  --sea: oklch(0.76 0.14 200);
+  --sea-foreground: oklch(0.15 0.02 200);
+
+  --elevation-1: 0 1px 3px oklch(0 0 0 / 0.3), 0 1px 2px oklch(0 0 0 / 0.2);
+  --elevation-2: 0 4px 6px oklch(0 0 0 / 0.3), 0 10px 15px oklch(0 0 0 / 0.25);
+  --elevation-3: 0 10px 15px oklch(0 0 0 / 0.4), 0 25px 50px oklch(0 0 0 / 0.5);
 }
 
 /*
@@ -278,38 +258,46 @@
 }
 
 @layer utilities {
-  .font-heading {
-    font-family: var(--font-serif);
+  .font-display {
+    font-family: var(--font-display);
   }
   .prose-blog {
-    max-width: var(--reading-width, 680px);
+    max-width: var(--reading-measure);
   }
   .prose-blog h1,
   .prose-blog h2,
   .prose-blog h3,
   .prose-blog h4 {
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
     font-weight: 600;
+    letter-spacing: -0.01em;
     line-height: 1.3;
   }
 
-  /* Deep-obscured glassmorphism effect (Super High Blur 80px with 95% opacity background-mix) */
+  /* Modern glassmorphism effect */
   .frosted {
-    backdrop-filter: blur(80px) saturate(140%);
-    -webkit-backdrop-filter: blur(80px) saturate(100%);
-    background-color: color-mix(in srgb, var(--surface) 95%, transparent);
+    backdrop-filter: blur(40px) saturate(140%);
+    -webkit-backdrop-filter: blur(40px) saturate(140%);
+    background-color: color-mix(in srgb, var(--surface) 88%, transparent);
   }
-  
-  .header-fade-bottom::after {
-    content: '';
-    position: absolute;
-    bottom: -16px;
-    left: 0;
-    right: 0;
-    height: 16px;
-    background: linear-gradient(to bottom, color-mix(in srgb, var(--background) 30%, transparent), transparent);
-    pointer-events: none;
+
+  .frosted-heavy {
+    backdrop-filter: blur(60px) saturate(160%);
+    -webkit-backdrop-filter: blur(60px) saturate(160%);
+    background-color: color-mix(in srgb, var(--surface) 85%, transparent);
   }
+
+  /* Parallax depth layers */
+  .parallax-bg {
+    transform: translateZ(-1px) scale(1.1);
+  }
+  .parallax-base {
+    transform: translateZ(0);
+  }
+  .parallax-top {
+    transform: translateZ(-10px) scale(0.95);
+  }
+
   .reading-width {
     max-width: var(--reading-measure);
     margin-left: auto;
@@ -318,20 +306,81 @@
     padding-right: var(--space-gutter);
   }
 
-  /* 12-column grid on a 1200px container. Used by the bento layout; most pages
-     only need Container + Section. */
+  /* 12-column grid on a 1400px container */
   .grid-12 {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: var(--space-gutter);
+    max-width: var(--container-max);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--space-gutter);
+    padding-right: var(--space-gutter);
   }
 
-  /* Minimum comfortable touch target. Applied to icon buttons and list rows. */
+  /* Minimum touch target */
   .tap-target {
     min-height: 2.75rem;
     min-width: 2.75rem;
   }
+
+  /* Custom cursor for interactive elements */
+  .cursor-custom {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='1.5'%3E%3Cpath d='M12 2v20M2 12h20'/%3E%3C/svg%3E"), auto;
+  }
+
+  /* 3D hover effect utility */
+  .hover-3d {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+  }
+  .hover-3d:hover {
+    transform: rotateY(2deg) translateZ(10px);
+  }
 }
+
+/* ============ Print styles (keep same as before) ============ */
+@media print {
+  [data-reading-chrome],
+  [data-no-print],
+  header,
+  footer {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+  [data-reveal],
+  [data-article-enter] {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  [data-reading-content] a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75em;
+    word-break: break-all;
+  }
+  img,
+  table,
+  pre {
+    break-inside: avoid;
+  }
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+}
+
+/* Reader preferences - keep same as before */
 
 /* ==========================================================================
    Print — chapters and notes are the only things worth printing.

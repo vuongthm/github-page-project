@@ -42,14 +42,15 @@ export function Reveal({
     disabled: !siteConfig.features.motion,
   })
 
+  const Comp = Component as any
   return (
-    <Component
+    <Comp
       ref={ref}
       data-reveal={phase}
       style={phase === "static" ? undefined : revealVars({ distance, duration, delay })}
       className={cn(className)}
     >
       {children}
-    </Component>
+    </Comp>
   )
 }

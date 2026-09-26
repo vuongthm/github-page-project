@@ -1,362 +1,167 @@
-import { ArrowRight, BookOpen, FolderGit2, Images, NotebookPen, Sparkles, User } from "lucide-react"
-import { Header } from "@/components/layout/header"
+"use client"
+
+import { motion } from "framer-motion"
+import { Canvas } from "@react-three/fiber"
+import { Suspense, lazy, use } from "react"
+import { ModernHeader } from "@/components/layout/modern-header"
 import { Footer } from "@/components/layout/footer"
-import { CommandPalette } from "@/components/features/command-palette"
-import { ContinueReadingRow } from "@/components/home/continue-reading-row"
-import { HubCard } from "@/components/home/hub-card"
-import { NoteCard } from "@/components/content/note-card"
-import { Avatar } from "@/components/ui/avatar"
-import { ChipLink } from "@/components/ui/chip"
+import { HoverExpandCard } from "@/components/core/micro-hover-card"
+import { ParallaxLayer } from "@/components/core/parallax-layer"
 import { Container } from "@/components/ui/container"
-import { Eyebrow } from "@/components/ui/eyebrow"
 import { Link } from "@/components/ui/link"
-import { SectionHeading, SectionRule } from "@/components/ui/section"
-import { Reveal } from "@/components/motion/reveal"
-import {
-  getAllTags,
-  getVisibleAlbums,
-  getVisibleNotes,
-  getVisibleSeries,
-  type Lang,
-} from "@/lib/data"
-import { siteConfig } from "@/lib/site.config"
+import { Eyebrow } from "@/components/ui/eyebrow"
+import { ArrowRight } from "lucide-react"
+import type { Lang } from "@/lib/data"
+import { getVisibleSeries, getAllTags } from "@/lib/data"
 
-/**
- * Home page — a SERVER component.
- *
- * It used to be a client component, which meant the whole content tree was
- * bundled and hydrated just to render a list. It holds no state now: the
- * interactive pieces (Header, Reveal, BackToTop) are client components imported
- * in, so this markup is rendered once at build time.
- *
- * Layout follows the F-pattern: identity top-left, then hubs scanning left to
- * right, then a narrower column of writing and tags further down.
- */
+const Hero3DScene = lazy(() =>
+  import("@/components/core/3d-scene").then((mod) => ({ default: mod.Hero3DScene }))
+)
 
-/**
- * Copy as key -> { en, vi } rather than one object per language: adding a string
- * is one line, and a missing translation is a type error instead of a blank.
- */
-const TEXT = {
-  eyebrow: { en: "Stories & notes from Vietnam", vi: "Chuyện kể & ghi chú từ Việt Nam" },
-  tagline: {
-    en: "Telling life stories. Sharing what I've learned.",
-    vi: "Kể chuyện cuộc đời. Chia sẻ những gì học được.",
-  },
-  ctaStories: { en: "Read Stories", vi: "Đọc chuyện kể" },
-  ctaNotes: { en: "Browse Notes", vi: "Xem ghi chú" },
-  hubsEyebrow: { en: "Explore", vi: "Khám phá" },
-  hubsHeading: { en: "Where to go next", vi: "Đi đâu tiếp" },
-  hubsLead: {
-    en: "Four places to wander. Each one tells you what is inside before you click.",
-    vi: "Bốn nơi để ghé. Mỗi nơi cho bạn biết có gì bên trong trước khi bấm vào.",
-  },
-  stories: { en: "Stories", vi: "Chuyện kể" },
-  storiesDesc: {
-    en: "Long-form memoirs, written one chapter at a time.",
-    vi: "Hồi ký dài, viết từng chương một.",
-  },
-  notes: { en: "Notes", vi: "Ghi chú" },
-  notesDesc: {
-    en: "Short technical notes, mostly about networks.",
-    vi: "Ghi chú kỹ thuật ngắn, phần lớn về mạng.",
-  },
-  album: { en: "Album", vi: "Album" },
-  albumDesc: {
-    en: "Photos and videos, kept private behind a password.",
-    vi: "Ảnh và video, để riêng tư sau mật khẩu.",
-  },
-  about: { en: "About", vi: "Về tôi" },
-  aboutDesc: {
-    en: "Who I am, where I come from, and how I got here.",
-    vi: "Tôi là ai, đến từ đâu, và đã đi tới đây thế nào.",
-  },
-  projects: { en: "Projects", vi: "Dự án" },
-  projectsDesc: {
-    en: "Things I have built, with notes on the trade-offs.",
-    vi: "Những thứ tôi đã làm, kèm ghi chú về đánh đổi.",
-  },
-  askAi: { en: "Ask AI", vi: "Hỏi AI" },
-  askAiDesc: {
-    en: "Ask questions about the page you are reading.",
-    vi: "Đặt câu hỏi về trang bạn đang đọc.",
-  },
-  latestEyebrow: { en: "Recent", vi: "Gần đây" },
-  latestHeading: { en: "Latest writing", vi: "Bài viết mới" },
-  tagsHeading: { en: "Browse by tag", vi: "Xem theo thẻ" },
-  viewAll: { en: "View all", vi: "Xem tất cả" },
-  empty: { en: "Nothing published here yet.", vi: "Chưa có nội dung nào ở đây." },
-  seriesLabel: { en: "series", vi: "bộ" },
-  notesLabel: { en: "notes", vi: "ghi chú" },
-  albumsLabel: { en: "albums", vi: "album" },
-} as const
-
-type TextKey = keyof typeof TEXT
-
-function text(lang: Lang) {
-  return (key: TextKey) => TEXT[key][lang]
-}
-
-/** Tag chips grow with frequency — a cloud that actually communicates volume. */
-function tagSize(count: number, max: number): string {
-  if (max <= 1) return "text-small"
-  const ratio = count / max
-  if (ratio > 0.8) return "text-h3"
-  if (ratio > 0.55) return "text-lead"
-  if (ratio > 0.3) return "text-body"
-  return "text-small"
-}
-
-export default async function HomePage({ params }: { params: Promise<{ lang: Lang }> }) {
-  const { lang } = await params
-  const t = text(lang)
-
+export default function HomePage({ params }: { params: Promise<{ lang: Lang }> }) {
+  const { lang } = use(params)
   const series = getVisibleSeries(lang)
-  const notes = getVisibleNotes(lang)
-  const albums = getVisibleAlbums(lang)
   const tags = getAllTags(lang)
-  const maxTagCount = tags[0]?.count ?? 1
-
-  /*
-    Hubs advertise live counts, so the home page always describes what is
-    actually published instead of hardcoded copy. `count` is optional because the
-    About hub has nothing to count.
-  */
-  const hubs: Array<{
-    key: string
-    href: string
-    title: string
-    description: string
-    icon: typeof BookOpen
-    count?: number
-    countLabel?: string
-    latest?: string
-  }> = [
-    {
-      key: "stories",
-      href: "/stories",
-      title: t("stories"),
-      description: t("storiesDesc"),
-      icon: BookOpen,
-      count: series.length,
-      countLabel: t("seriesLabel"),
-      latest: series[0]?.title,
-    },
-    {
-      key: "notes",
-      href: "/notes",
-      title: t("notes"),
-      description: t("notesDesc"),
-      icon: NotebookPen,
-      count: notes.length,
-      countLabel: t("notesLabel"),
-      latest: notes[0]?.title,
-    },
-    {
-      key: "album",
-      href: "/my-album",
-      title: t("album"),
-      description: t("albumDesc"),
-      icon: Images,
-      count: albums.length,
-      countLabel: t("albumsLabel"),
-    },
-    {
-      key: "about",
-      href: "/about",
-      title: t("about"),
-      description: t("aboutDesc"),
-      icon: User,
-    },
-  ]
-
-  // Feature-flagged hubs: later phases only need to flip a switch in site.config.
-  if (siteConfig.features.projects) {
-    hubs.push({
-      key: "projects",
-      href: "/projects",
-      title: t("projects"),
-      description: t("projectsDesc"),
-      icon: FolderGit2,
-    })
-  }
-  if (siteConfig.features.aiAssistant) {
-    hubs.push({
-      key: "ask-ai",
-      href: "/ask",
-      title: t("askAi"),
-      description: t("askAiDesc"),
-      icon: Sparkles,
-    })
-  }
-
-  const latest = notes.slice(0, 3)
 
   return (
     <>
-      <Header />
-      <main id="main-content" className="pt-[var(--header-h)]">
-        {/* ---- Hero: identity, one line, two actions ------------------- */}
-        <Container className="pt-12 pb-10 sm:pt-16 sm:pb-12">
-          <div className="grid items-center gap-8 md:grid-cols-[1fr_auto] md:gap-16">
-            <div className="max-w-2xl">
-              <Eyebrow tone="brand">{t("eyebrow")}</Eyebrow>
-
-              <h1 className="mt-3 text-display text-foreground">
-                {siteConfig.name}
-                <span className="text-accent-brand">.</span>
-              </h1>
-
-              <p className="mt-4 max-w-xl text-pretty text-lead leading-relaxed text-muted-foreground">
-                {t("tagline")}
-              </p>
-
-              <div className="mt-7 flex flex-wrap items-center gap-3">
-                <Link
-                  href="/stories"
-                  className="group inline-flex tap-target items-center gap-2 rounded-[var(--radius)] bg-accent-brand px-5 text-small font-medium text-accent-brand-foreground transition-opacity duration-150 hover:opacity-90"
-                >
-                  {t("ctaStories")}
-                  <ArrowRight
-                    size={14}
-                    className="transition-transform duration-200 group-hover:translate-x-0.5"
-                  />
-                </Link>
-                <Link
-                  href="/notes"
-                  className="inline-flex tap-target items-center gap-2 rounded-[var(--radius)] border border-border-strong px-5 text-small font-medium text-foreground transition-colors duration-150 hover:bg-muted"
-                >
-                  {t("ctaNotes")}
-                </Link>
-                {/* Keyboard-first jump-off point, visible instead of implied. */}
-                {siteConfig.features.commandPalette ? (
-                  <CommandPalette lang={lang} mode="inline" />
-                ) : null}
-              </div>
-            </div>
-
-            <Avatar
-              src="/avatar.webp"
-              name={siteConfig.author.name}
-              size="xl"
-              priority
-              className="order-first md:order-last"
-            />
-          </div>
-        </Container>
-
-        {/* ---- Resume: rendered only once a chapter or note has been visited.
-             Directly under the hero, so it is the first thing a returning reader
-             sees, and it collapses to nothing for a first-time visitor. ------- */}
-        {siteConfig.features.continueReading ? <ContinueReadingRow lang={lang} /> : null}
-
-        <SectionRule />
-
-        {/* ---- Bento hubs: what the site contains, with live counts ----- */}
-        <Container className="py-[var(--space-section)]">
-          <SectionHeading
-            eyebrow={t("hubsEyebrow")}
-            title={t("hubsHeading")}
-            description={t("hubsLead")}
-          />
-
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {hubs.map((hub, index) => (
-              <Reveal key={hub.key} delay={index * 70} className="h-full">
-                <HubCard
-                  href={hub.href}
-                  title={hub.title}
-                  description={hub.description}
-                  icon={hub.icon}
-                  count={hub.count}
-                  countLabel={hub.countLabel}
-                  latest={hub.latest}
-                  // The first tile carries the emphasis so the eye lands
-                  // somewhere deliberate, then scans left to right.
-                  emphasis={index === 0}
-                  className="h-full"
-                />
-              </Reveal>
-            ))}
-          </div>
-        </Container>
-
-        <SectionRule />
-
-        {/* ---- Latest writing ------------------------------------------ */}
-        <Container className="py-[var(--space-section)]">
-          <SectionHeading
-            eyebrow={t("latestEyebrow")}
-            title={t("latestHeading")}
-            action={
-              <Link
-                href="/notes"
-                className="group inline-flex tap-target items-center gap-1.5 text-small font-medium text-accent-brand"
-              >
-                {t("viewAll")}
-                <ArrowRight
-                  size={13}
-                  className="transition-transform duration-200 group-hover:translate-x-0.5"
-                />
-              </Link>
-            }
-          />
-
-          <Reveal className="mt-6">
-            {latest.length === 0 ? (
-              <p className="text-small text-muted-foreground">{t("empty")}</p>
-            ) : (
-              <div className="divide-y divide-border">
-                {latest.map((note) => (
-                  <NoteCard key={note.slug} note={note} lang={lang} variant="compact" />
-                ))}
-              </div>
-            )}
-          </Reveal>
-        </Container>
-
-        {/* ---- Tag cloud ----------------------------------------------- */}
-        {tags.length > 0 ? (
-          <>
-            <SectionRule />
-            <Container className="py-[var(--space-section)]">
-              <SectionHeading
-                eyebrow={t("hubsEyebrow")}
-                title={t("tagsHeading")}
-                action={
-                  <Link
-                    href="/tags"
-                    className="group inline-flex tap-target items-center gap-1.5 text-small font-medium text-accent-brand"
-                  >
-                    {t("viewAll")}
-                    <ArrowRight
-                      size={13}
-                      className="transition-transform duration-200 group-hover:translate-x-0.5"
-                    />
-                  </Link>
-                }
-              />
-
-              {/* Size varies with frequency, so the cloud carries information
-                  rather than being decoration. */}
-              <Reveal className="mt-7 flex flex-wrap items-center gap-2.5">
-                {tags.slice(0, 24).map((tag) => (
-                  <ChipLink
-                    key={tag.tag}
-                    href={`/tags/${tag.tag}`}
-                    className={`px-3 py-1 ${tagSize(tag.count, maxTagCount)}`}
-                  >
-                    {tag.tag}
-                    <span className="ml-1.5 font-mono text-eyebrow opacity-60">{tag.count}</span>
-                  </ChipLink>
-                ))}
-              </Reveal>
-            </Container>
-          </>
-        ) : null}
+      <ModernHeader />
+      <main className="pt-16">
+        <HeroSection lang={lang} />
+        <FeaturedSection lang={lang} series={series} />
+        <TagSection lang={lang} tags={tags} />
       </main>
       <Footer lang={lang} />
     </>
   )
 }
 
+function HeroSection({ lang }: { lang: Lang }) {
+  return (
+    <section className="relative min-h-screen flex items-center overflow-hidden">
+      <div className="absolute inset-0 -z-10">
+        <Canvas camera={{ position: [0, 0, 5], fov: 60 }} className="bg-transparent">
+          <Suspense fallback={null}>
+            <Hero3DScene />
+          </Suspense>
+        </Canvas>
+      </div>
+      <div className="mx-auto max-w-[var(--container-max)] px-[var(--space-gutter)] pt-20 pb-32">
+        <ParallaxLayer speed={0.2}>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+            className="max-w-3xl"
+          >
+            <Eyebrow tone="brand" className="mb-4">
+              {lang === "en" ? "Tech Life Stories" : "Công nghệ Cuộc sống Câu chuyện"}
+            </Eyebrow>
+            <h1 className="font-display text-display font-bold leading-tight text-foreground mb-6">
+              {lang === "en" ? (
+                <>Where <span className="text-accent-brand">code meets life</span></>
+              ) : (
+                <>Nơi <span className="text-accent-brand">code gặp cuộc sống</span></>
+              )}
+            </h1>
+            <p className="text-lead text-muted-foreground/90 max-w-2xl mb-10">
+              {lang === "en"
+                ? "Technical notes, life stories."
+                : "Ghi chú kỹ thuật, câu chuyện cuộc đời."}
+            </p>
+            <div className="flex gap-4">
+              <Link
+                href="/stories"
+                className="inline-flex items-center gap-2 rounded-xl bg-accent-brand px-6 py-3 text-sm font-medium transition-all hover:scale-105"
+              >
+                {lang === "en" ? "Explore Stories" : "Khám phá chuyện"}
+                <ArrowRight size={16} />
+              </Link>
+              <Link
+                href="/notes"
+                className="inline-flex items-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-medium transition-all"
+              >
+                {lang === "en" ? "Tech Notes" : "Ghi chú kỹ thuật"}
+              </Link>
+            </div>
+          </motion.div>
+        </ParallaxLayer>
+      </div>
+    </section>
+  )
+}
+
+function FeaturedSection({ lang, series }: { lang: Lang; series: any[] }) {
+  return (
+    <section className="py-[var(--space-section)]">
+      <Container>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-16"
+        >
+          <Eyebrow tone="brand">{lang === "en" ? "Featured" : "Nổi bật"}</Eyebrow>
+          <h2 className="font-display text-h1 font-bold text-foreground">
+            {lang === "en" ? "Latest writing" : "Bài viết mới"}
+          </h2>
+        </motion.div>
+
+<div className="grid grid-cols-1 gap-[var(--space-gutter)] md:grid-cols-2 lg:grid-cols-3">
+          {series.slice(0, 6).map((s, i) => (
+            <HoverExpandCard
+              key={s.slug}
+              href={`/stories/${s.slug}`}
+              title={s.title}
+              description={s.description}
+              tags={[s.category]}
+              className="h-full"
+            />
+          ))}
+        </div>
+      </Container>
+    </section>
+  )
+}
+
+function TagSection({ lang, tags }: { lang: Lang; tags: any[] }) {
+  return (
+    <section className="py-[var(--space-section)] bg-surface-sunken/30">
+      <Container>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-12"
+        >
+          <Eyebrow tone="brand">{lang === "en" ? "Topics" : "Chủ đề"}</Eyebrow>
+          <h2 className="font-display text-h1 font-bold text-foreground">
+            {lang === "en" ? "Explore by topics" : "Khám phá theo chủ đề"}
+          </h2>
+        </motion.div>
+        <motion.div
+          className="flex flex-wrap gap-3"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          {tags.slice(0, 15).map((tag) => (
+            <Link
+              key={tag.tag}
+              href={`/tags/${tag.tag}`}
+              className="group inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:bg-accent-brand/5 hover:text-accent-brand"
+            >
+              <span className="text-xs opacity-70 group-hover:opacity-100">{tag.count}</span>
+              {tag.tag}
+            </Link>
+          ))}
+        </motion.div>
+      </Container>
+    </section>
+  )
+}
+
+HomePage.displayName = "HomePage"

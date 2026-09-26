@@ -17,8 +17,9 @@ interface EyebrowProps {
 }
 
 export function Eyebrow({ children, className, as: Component = "p", tone = "muted" }: EyebrowProps) {
+  const Comp = Component as any
   return (
-    <Component
+    <Comp
       className={cn(
         "font-mono text-eyebrow uppercase tracking-[0.18em] leading-none",
         tone === "brand" ? "text-accent-brand" : "text-muted-foreground",
@@ -26,6 +27,6 @@ export function Eyebrow({ children, className, as: Component = "p", tone = "mute
       )}
     >
       {children}
-    </Component>
+    </Comp>
   )
 }

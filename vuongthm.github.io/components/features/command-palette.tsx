@@ -464,7 +464,7 @@ export function CommandPalette({
 
 
               {results.map((item, position) => {
-                const Icon = item.icon
+                const Icon: any = item.icon
                 const isActive = position === activeIndex
                 const previous = results[position - 1]
                 const startsGroup = !previous || previous.group !== item.group
