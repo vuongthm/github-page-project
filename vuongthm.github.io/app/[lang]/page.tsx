@@ -38,7 +38,7 @@ export default function HomePage({ params }: { params: Promise<{ lang: Lang }> }
 
 function HeroSection({ lang }: { lang: Lang }) {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+          <section className="relative min-h-screen md:min-h-[85vh] flex items-center overflow-hidden">
       <div className="absolute inset-0 -z-10">
         <Canvas camera={{ position: [0, 0, 5], fov: 60 }} className="bg-transparent">
           <Suspense fallback={null}>
@@ -46,7 +46,9 @@ function HeroSection({ lang }: { lang: Lang }) {
           </Suspense>
         </Canvas>
       </div>
-      <div className="mx-auto max-w-[var(--container-max)] px-[var(--space-gutter)] pt-20 pb-32">
+      {/* Gradient overlay to improve text legibility over 3D scene */}
+      <div className="absolute inset-0 -z-9 bg-gradient-to-br from-background/95 via-background/80 to-transparent" />
+            <div className="mx-auto max-w-[var(--container-max)] px-[var(--space-gutter)] pt-16 pb-24 md:pt-20 md:pb-32">
         <ParallaxLayer speed={0.2}>
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -69,17 +71,17 @@ function HeroSection({ lang }: { lang: Lang }) {
                 ? "Technical notes, life stories."
                 : "Ghi chú kỹ thuật, câu chuyện cuộc đời."}
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/stories"
-                className="inline-flex items-center gap-2 rounded-xl bg-accent-brand px-6 py-3 text-sm font-medium transition-all hover:scale-105"
+                className="inline-flex items-center gap-2 rounded-xl bg-accent-brand px-6 py-3 text-sm font-medium text-background transition-all hover:scale-105 hover:bg-accent-brand/90"
               >
                 {lang === "en" ? "Explore Stories" : "Khám phá chuyện"}
                 <ArrowRight size={16} />
               </Link>
               <Link
                 href="/notes"
-                className="inline-flex items-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-medium transition-all"
+                className="inline-flex items-center gap-2 rounded-xl border-2 border-foreground/30 px-6 py-3 text-sm font-medium text-foreground transition-all hover:border-accent-brand hover:text-accent-brand"
               >
                 {lang === "en" ? "Tech Notes" : "Ghi chú kỹ thuật"}
               </Link>

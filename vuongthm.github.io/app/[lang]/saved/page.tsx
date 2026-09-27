@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from "react"
 import { ArrowRight, Bookmark, Trash2 } from "lucide-react"
-import { Header } from "@/components/layout/header"
+import { ModernHeader as Header } from "@/components/layout/modern-header"
 import { Footer } from "@/components/layout/footer"
 import { Link } from "@/components/ui/link"
 import { Container } from "@/components/ui/container"

@@ -347,18 +347,17 @@ the intended home for *shared* strings, inline objects are fine for page-local c
 Tokens are defined **once**, at the top of `app/globals.css`. Components never hardcode
 colour, size or spacing.
 
-### Palette — "Coastal Editorial"
+### Palette — "Quantum Void"
 
-Warm paper, warm ink, one ochre brand accent, one deep-sea teal used sparingly. **No
-pure neutral greys**: every value carries warmth, which is what makes the pages read as
-paper rather than as a dashboard.
+Deep space void with holographic blue accents, one deep-sea teal used sparingly. **No
+pure neutral greys**: every value carries depth and contrast for readability.
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
 | `--background` | `#fbf9f6` | `#0f0e0c` | page |
 | `--foreground` | `#17150f` | `#f6f2ea` | text |
 | `--surface-sunken` | `#f5f1ea` | `#141210` | alternating section bands |
-| `--accent-brand` | `#b45309` | `#f0a04b` | links, CTAs, active states |
+| `--accent-brand` | `#3b82f6` | `#60a5fa` | links, CTAs, active states |
 | `--sea` | `#1c5f6b` | `#6ec3cf` | tags and secondary accents |
 
 **The dark palette is defined exactly once**, in `.dark`. There is deliberately **no
@@ -385,7 +384,7 @@ rhythm and heading layout), `Eyebrow` (uppercase mono label), `Chip` / `ChipLink
 
 ### Brand assets
 
-`components/brand/logo.tsx` — `Logo` (a "V" over a horizon line, ochre right stroke),
+`components/brand/logo.tsx` — `Logo` (an 8-bar stepped waveform mark in brand blue),
 `Wordmark`, `BrandLockup`. Used by header, footer and the favicon source
 (`public/icon.svg`, rasterised by `pnpm icons`).
 
@@ -547,7 +546,7 @@ majors for `next` / `react` are ignored on purpose.
 - Verified end-to-end: all 36 ciphertexts in the real generated data decrypt with the
   real passwords, and a wrong password returns `null` rather than garbage.
 
-### If you are an AI picking this up
+### For future AI references
 
 1. Read `lib/site.config.ts`, `app/globals.css` (tokens) and `scripts/pipeline.mjs` first —
    they define the conventions everything else follows.
@@ -556,6 +555,18 @@ majors for `next` / `react` are ignored on purpose.
 4. Never commit `passwords.json`.
 5. When touching animation, navigation or the pipeline, read §15 first: those are the
    areas where an apparently reasonable change has already caused a real regression.
+
+## 20. Header & Footer Design (Updated)
+
+- **Unified `ModernHeader`** across all 11 app pages, replacing legacy `Header`.
+- **Nav indicators**: active tab shows a brand-colored bottom bar on desktop, dot indicator on mobile menu.
+- **`LangSwitcher`**: flag-only button (🇬🇧/🇻🇳). Dropdown shows both flags; current lang ringed.
+- **Hero readability**: gradient overlay behind 3D Canvas; boosted "Where ..." title contrast; "Tech Notes" button with clearer border styling.
+- **Footer**: "Writing"/"Nội dung" and "Info"/"Thông tin" sections; "Crafted with care, from Vietnam" / "Tận tâm từ Việt Nam"; brand lockup without handle.
+- **Search**: Ctrl+K button in `ModernHeader` (hidden on mobile due to native Cmd+K palette).
+- **Responsive**: breakpoints at `md (768px)` and `sm (640px)`.
+
+
 
 
 

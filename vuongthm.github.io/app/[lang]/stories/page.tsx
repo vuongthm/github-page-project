@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Header } from "@/components/layout/header"
+import { ModernHeader as Header } from "@/components/layout/modern-header"
 import { Footer } from "@/components/layout/footer"
 import { SeriesCard } from "@/components/content/series-card"
 import { Container } from "@/components/ui/container"

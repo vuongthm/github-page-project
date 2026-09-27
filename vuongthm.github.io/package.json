@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "pipeline": "node scripts/pipeline.mjs --mode=build",
-    "dev": "node scripts/pipeline.mjs --mode=dev && next dev",
+        "dev": "node scripts/pipeline.mjs --mode=dev && next dev",
+    "dev:network": "node scripts/pipeline.mjs --mode=dev && next dev --hostname 0.0.0.0",
+    "dev:lan": "node scripts/pipeline.mjs --mode=dev && next dev --hostname 192.168.1.17",
     "dev:stop": "node scripts/dev-stop.mjs",
     "build": "node scripts/pipeline.mjs --mode=build && next build && node scripts/prune-originals.mjs",
     "build:force": "node scripts/pipeline.mjs --mode=build --force && next build && node scripts/prune-originals.mjs",

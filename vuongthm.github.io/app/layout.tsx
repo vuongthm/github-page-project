@@ -58,9 +58,9 @@ const jetbrainsMono = JetBrains_Mono({
 // Defined once in `lib/site.config.ts` so the name, URL and description are
 // never out of sync between metadata, footer, sitemap and JSON-LD.
 export const metadata: Metadata = {
-  title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
+        title: {
+    default: `Home | ${siteConfig.shortName}`,
+    template: `%s | ${siteConfig.shortName}`,
   },
   description: siteConfig.description[siteConfig.defaultLang],
   authors: [{ name: siteConfig.author.name, url: siteConfig.url }],

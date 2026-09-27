@@ -5,7 +5,7 @@ import { Link } from "@/components/ui/link"
 import { Container } from "@/components/ui/container"
 import { useState, useEffect, useCallback, use } from "react"
 import { Mail, ChevronLeft, ChevronRight, Users, Shield, Network, PenTool, Images } from "lucide-react"
-import { Header } from "@/components/layout/header"
+import { ModernHeader as Header } from "@/components/layout/modern-header"
 import { Footer } from "@/components/layout/footer"
 import { cn } from "@/lib/utils"
 

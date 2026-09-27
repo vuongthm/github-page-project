@@ -4,7 +4,7 @@ import { Link } from "@/components/ui/link"
 import { Container } from "@/components/ui/container"
 import { Avatar } from "@/components/ui/avatar"
 import { ArrowLeft } from "lucide-react"
-import { Header } from "@/components/layout/header"
+import { ModernHeader as Header } from "@/components/layout/modern-header"
 import { Footer } from "@/components/layout/footer"
 import { useLang } from "@/components/providers/lang-provider"
 

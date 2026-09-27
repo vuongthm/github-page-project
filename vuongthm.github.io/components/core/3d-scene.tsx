@@ -24,7 +24,7 @@ function AnimatedTorus({ theme }: { theme: string }) {
   })
 
   const color = useMemo(() => {
-    return theme === "dark" ? "#8b5cf6" : "#7c3aed"
+    return theme === "dark" ? "#60a5fa" : "#3b82f6"
   }, [theme])
 
   return (
@@ -62,7 +62,7 @@ function AnimatedParticles({ theme }: { theme: string }) {
   })
 
   const color = useMemo(() => {
-    return theme === "dark" ? "#a78bfa" : "#8b5cf6"
+    return theme === "dark" ? "#93c5fd" : "#3b82f6"
   }, [theme])
 
   return (
@@ -107,7 +107,7 @@ function InteractiveSphere() {
     >
       <sphereGeometry args={[0.8, 64, 64]} />
       <MeshDistortMaterial
-        color={clicked ? "#ec4899" : "#8b5cf6"}
+        color={clicked ? "#3b82f6" : "#60a5fa"}
         speed={2}
         distort={0.3}
       />
@@ -124,7 +124,7 @@ export function Hero3DScene() {
       <PerformanceMonitor />
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} intensity={1} />
-      <pointLight position={[-10, -10, -10]} intensity={0.5} color="#8b5cf6" />
+      <pointLight position={[-10, -10, -10]} intensity={0.5} color="#3b82f6" />
 
       <color attach="background" args={["#0a0a11"]} />
       <Stars radius={500} depth={60} count={1000} factor={7} saturation={0} />

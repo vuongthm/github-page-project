@@ -7,6 +7,7 @@ import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { Link } from "@/components/ui/link"
 import { BrandLockup } from "@/components/brand/logo"
+import { LangSwitcher } from "@/components/features/lang-switcher"
 import { cn } from "@/lib/utils"
 import { useLang } from "@/components/providers/lang-provider"
 
@@ -26,13 +27,9 @@ const NAV_LABELS: Record<string, { en: string; vi: string }> = {
   about: { en: "About", vi: "Về tôi"},
 }
 
-const ICONS = {
-  home: "🏠", stories: "📚", notes: "📝", tags: "🏷️", about: "👤"
-}
-
 export function ModernHeader() {
-  const { setTheme, resolvedTheme } = useTheme()
-  const { lang, setLang } = useLang()
+    const { setTheme, resolvedTheme } = useTheme()
+  const { lang } = useLang()
   const [mounted, setMounted] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -40,8 +37,12 @@ export function ModernHeader() {
 
   const pathname = usePathname()
   const isNavActive = (href: string) => {
-    if (href === "/") return pathname === `/${lang}` || pathname === "/"
-    return pathname.startsWith(href.replace("/", `/${lang}/`))
+    // Remove lang prefix from pathname for comparison
+    const pathWithoutLang = pathname.replace(`/${lang}`, "")
+    if (href === "/") {
+      return pathWithoutLang === "" || pathWithoutLang === "/"
+    }
+    return pathWithoutLang.startsWith(href)
   }
 
   return (
@@ -59,20 +60,33 @@ export function ModernHeader() {
               key={key}
               href={href}
               className={cn(
-                "flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-all",
+                "relative flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all",
                 "hover:bg-accent-brand/10 hover:text-accent-brand",
-                isNavActive(href)
-                  ? "bg-accent-brand/15 text-accent-brand"
-                  : "text-muted-foreground"
+                isNavActive(href) ? "text-accent-brand" : "text-muted-foreground"
               )}
             >
-              <span className="text-xs">{ICONS[key as keyof typeof ICONS]}</span>
               {NAV_LABELS[key][lang]}
+              {isNavActive(href) && (
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-accent-brand rounded-full" />
+              )}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              const event = new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true })
+              window.dispatchEvent(event)
+            }}
+            className="hidden sm:flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent-brand/10 hover:text-accent-brand transition-all"
+            aria-label="Open search (Ctrl+K)"
+            title="Search (Ctrl+K)"
+          >
+            <Search size={18} />
+          </button>
+
           <button
             onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
             className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent-brand/10 hover:text-accent-brand transition-all"
@@ -81,13 +95,7 @@ export function ModernHeader() {
             {mounted && resolvedTheme === "dark" ? <Sun size={18}/> : <Moon size={18}/>}
           </button>
 
-          <button
-            onClick={() => setLang(lang === "en" ? "vi" : "en")}
-            className="hidden sm:flex h-9 items-center gap-1.5 rounded-lg px-3 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:bg-accent-brand/10 hover:text-accent-brand transition-all"
-            aria-label="Toggle language"
-          >
-            {lang === "en" ? "Tiếng Việt" : "English"}
-          </button>
+          <LangSwitcher />
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -102,28 +110,35 @@ export function ModernHeader() {
       {/* Mobile menu */}
       {mobileOpen && (
         <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          className="md:hidden border-t border-border bg-surface/90 backdrop-blur-xl"
+          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+          transition={{ duration: 0.15 }}
+          className="md:hidden absolute top-full right-4 mt-2 w-52 rounded-lg border border-border bg-surface shadow-[var(--elevation-3)]"
         >
-          <div className="px-[var(--space-gutter)] py-4 flex flex-col gap-2">
-            {NAV_LINKS.map(({ key, href }) => (
-              <Link
-                key={key}
-                href={href}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all",
-                  isNavActive(href)
-                    ? "bg-accent-brand/15 text-accent-brand"
-                    : "text-muted-foreground hover:bg-accent-brand/10 hover:text-accent-brand"
-                )}
-              >
-                <span>{ICONS[key as keyof typeof ICONS]}</span>
-                {NAV_LABELS[key][lang]}
-              </Link>
-            ))}
+          <div className="py-1.5 flex flex-col gap-1">
+            {NAV_LINKS.map(({ key, href }) => {
+              const active = isNavActive(href)
+              return (
+                              <Link
+                  key={key}
+                  href={href}
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg mx-2 px-3 py-2.5 text-sm font-medium whitespace-nowrap transition-all",
+                    active
+                      ? "bg-accent-brand/10 text-accent-brand"
+                      : "text-muted-foreground hover:bg-accent-brand/10 hover:text-accent-brand"
+                  )}
+                >
+                  <span className={cn(
+                    "w-1.5 h-1.5 rounded-full",
+                    active ? "bg-accent-brand" : "bg-transparent"
+                  )} />
+                  {NAV_LABELS[key][lang]}
+                </Link>
+              )
+            })}
           </div>
         </motion.div>
       )}

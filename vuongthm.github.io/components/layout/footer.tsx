@@ -31,18 +31,21 @@ const COPY: Record<Lang, {
   contentHeading: string
   aboutHeading: string
   quoteText: string
+  originText: string
 }> = {
   en: {
     tagline: "Telling life stories. Sharing what I've learned.",
-    contentHeading: "Content",
-    aboutHeading: "About",
+    contentHeading: "Writing",
+    aboutHeading: "Info",
     quoteText: "Writing is the only way I know to think clearly.",
+    originText: "Crafted with care, from Vietnam",
   },
   vi: {
     tagline: "Kể chuyện cuộc đời. Chia sẻ những gì học được.",
     contentHeading: "Nội dung",
-    aboutHeading: "Về tôi",
+    aboutHeading: "Thông tin",
     quoteText: "Viết là cách duy nhất tôi biết để suy nghĩ rõ ràng.",
+    originText: "Tận tâm từ Việt Nam",
   },
 }
 
@@ -65,7 +68,7 @@ export function Footer({ lang = "en" }: { lang?: Lang }) {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" aria-label="Vuong — home" className="inline-block">
-              <BrandLockup size="md" withHandle />
+              <BrandLockup size="md" />
             </Link>
 
             <p className="mt-5 max-w-xs text-small leading-relaxed text-muted-foreground">
@@ -140,12 +143,12 @@ export function Footer({ lang = "en" }: { lang?: Lang }) {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-3 border-t border-border/70 py-6 sm:flex-row">
+                <div className="flex flex-col items-center justify-between gap-3 border-t border-border/70 py-6 sm:flex-row">
           <p className="text-caption text-muted-foreground">
             © {year} {siteConfig.author.name} ({siteConfig.shortName}). All rights reserved.
           </p>
           <p className="font-mono text-eyebrow uppercase tracking-[0.14em] text-muted-foreground">
-            Written in Vietnam
+            {c.originText}
           </p>
         </div>
       </Container>

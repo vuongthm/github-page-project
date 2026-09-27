@@ -7,20 +7,19 @@ import { cn } from "@/lib/utils"
  * One definition, used by the header, the footer and the not-found page, so the
  * mark cannot drift between them.
  *
- * The mark is a "V" rising over a horizon line — the coastal landscape the blog
- * is written from — with the right stroke in the brand ochre. It reads at 16 px
- * and at 40 px, which a detailed illustration would not.
+ * The mark is a stepped waveform — like a guitar tuner or equalizer — rising
+ * in a V-shape pattern, with all strokes in the brand blue accent.
  */
 
 interface LogoProps {
   className?: string
   /** Rendered size in px. The SVG scales cleanly. */
   size?: number
-  /** Include the horizon line. Off for very small sizes where it muddies. */
-  horizon?: boolean
+  /** Include the baseline. Off for very small sizes where it muddies. */
+  baseline?: boolean
 }
 
-export function Logo({ className, size = 24, horizon = true }: LogoProps) {
+export function Logo({ className, size = 24, baseline = true }: LogoProps) {
   return (
     <svg
       width={size}
@@ -31,11 +30,14 @@ export function Logo({ className, size = 24, horizon = true }: LogoProps) {
       aria-hidden="true"
       className={cn("shrink-0", className)}
     >
-      <path d="M5 5.5 12 18.5" stroke="currentColor" strokeWidth="2.2" />
-      <path d="M19 5.5 12 18.5" stroke="var(--accent-brand)" strokeWidth="2.2" />
-      {horizon && (
-        <path d="M3 21.5h18" stroke="currentColor" strokeWidth="1.3" opacity="0.3" />
-      )}
+      <line x1="1"     y1="9"    x2="1"     y2="15"   stroke="var(--accent-brand)" strokeWidth="2.2"></line>
+      <line x1="4.14"  y1="4"    x2="4.14"  y2="20"   stroke="var(--accent-brand)" strokeWidth="2.2"></line>
+      <line x1="7.29"  y1="3.5"  x2="7.29"  y2="20.5" stroke="var(--accent-brand)" strokeWidth="2.2"></line>
+      <line x1="10.43" y1="6.5"  x2="10.43" y2="17.5" stroke="var(--accent-brand)" strokeWidth="2.2"></line>
+      <line x1="13.57" y1="7"    x2="13.57" y2="17"   stroke="var(--accent-brand)" strokeWidth="2.2"></line>
+      <line x1="16.71" y1="9.5"  x2="16.71" y2="14.5" stroke="var(--accent-brand)" strokeWidth="2.2"></line>
+      <line x1="19.86" y1="7"    x2="19.86" y2="17"   stroke="var(--accent-brand)" strokeWidth="2.2"></line>
+      <line x1="23"    y1="6"    x2="23"    y2="18"   stroke="var(--accent-brand)" strokeWidth="2.2"></line>
     </svg>
   )
 }

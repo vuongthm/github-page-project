@@ -2,7 +2,7 @@ import { Link } from "@/components/ui/link"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Chip } from "@/components/ui/chip"
-import { BookOpen } from "lucide-react"
+import { BookOpen, Play } from "lucide-react"
 import type { Series, Lang } from "@/lib/data"
 import { cn } from "@/lib/utils"
 
@@ -27,23 +27,25 @@ export function SeriesCard({ series, lang = "en", className }: SeriesCardProps) 
     <Link
       href={`/stories/${series.slug}`}
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface",
-        // Only transform/shadow/border-colour: no layout-affecting properties,
-        // so the lift stays on the compositor.
-        "transition-[transform,box-shadow,border-color] duration-200 ease-out",
-        "hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md",
+        "group relative flex h-full overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface",
+        "transition-[transform,box-shadow,border-color] duration-300 ease-out",
+        "hover:-translate-y-1 hover:border-border-strong hover:shadow-[var(--elevation-3)]",
         className,
       )}
     >
-      <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+      {/* Image container */}
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
         <Image
           src={series.coverImage}
           alt={series.title}
           fill
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          priority={false}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+        {/* Status badge */}
         <div className="absolute right-3 top-3">
           <Badge
             variant="secondary"
@@ -57,30 +59,32 @@ export function SeriesCard({ series, lang = "en", className }: SeriesCardProps) 
             {STATUS_LABELS[series.status][lang]}
           </Badge>
         </div>
-      </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="mb-2 text-h3 text-pretty text-card-foreground transition-colors duration-150 group-hover:text-accent-brand">
-          {series.title}
-        </h3>
-
-        <p className="mb-5 line-clamp-2 text-small leading-relaxed text-muted-foreground">
-          {series.description}
-        </p>
-
-        {/* `mt-auto` keeps the meta row pinned to the bottom so cards of
-            differing description length still line up in a grid row. */}
-        <div className="mt-auto flex items-center justify-between gap-3">
-          <span className="flex items-center gap-1.5 text-caption text-muted-foreground">
-            <BookOpen size={13} />
-            {series.chapterCount} {CHAPTERS_LABEL[lang]}
-          </span>
-
-          <span className="flex flex-wrap items-center justify-end gap-1.5">
-            {series.tags.slice(0, 2).map((tag) => (
-              <Chip key={tag}>{tag}</Chip>
-            ))}
-          </span>
+        {/* Overlay card - appears on hover */}
+        <div className={cn(
+          "absolute inset-0 flex flex-col justify-end p-6",
+          "opacity-0 translate-y-2 transition-all duration-300 ease-out group-hover:opacity-100 group-hover:translate-y-0",
+          "bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+        )}>
+          <div className="space-y-3">
+            <h3 className="text-xl font-semibold text-white">
+              {series.title}
+            </h3>
+            <p className="line-clamp-2 text-sm text-gray-200/90 leading-relaxed">
+              {series.description}
+            </p>
+            <div className="flex items-center gap-4 text-xs text-gray-300">
+              <span className="flex items-center gap-1">
+                <BookOpen size={12} />
+                {series.chapterCount} {CHAPTERS_LABEL[lang]}
+              </span>
+              <span className="flex flex-wrap gap-1">
+                {series.tags.slice(0, 2).map((tag) => (
+                  <Chip key={tag} className="text-xs">{tag}</Chip>
+                ))}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </Link>
